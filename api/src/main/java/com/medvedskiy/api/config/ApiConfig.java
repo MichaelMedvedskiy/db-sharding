@@ -6,6 +6,9 @@ import org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
+/**
+ * Config for running Api
+ */
 @Configuration
 @Import({
         CoreConfig.class,

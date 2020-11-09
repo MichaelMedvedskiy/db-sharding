@@ -29,10 +29,10 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Payment"
-        '500':
+        '400':
           "$ref": "#/components/responses/BadRequest"
-        '403':
-          "$ref": "#/components/responses/Forbidden"
+        '500':
+          "$ref": "#/components/responses/InternalError"
 
   /total/sender/{id}:
     get:
@@ -55,10 +55,10 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/TotalSum"
-        '500':
+        '400':
           "$ref": "#/components/responses/BadRequest"
-        '403':
-          "$ref": "#/components/responses/Forbidden"
+        '500':
+          "$ref": "#/components/responses/InternalError"
 
 
 components:
@@ -108,15 +108,15 @@ components:
 
   responses:
     BadRequest:
-      description: Неверные параметры запроса
+      description: Плохой запрос
       content:
         application/json:
           schema:
             "$ref": "#/components/schemas/Error"
 
 
-    Forbidden:
-      description: Нет прав на выполнение действия
+    InternalError:
+      description: Ошибка сервера
       content:
         application/json:
           schema:

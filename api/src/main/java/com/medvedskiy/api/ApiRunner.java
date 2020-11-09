@@ -4,11 +4,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ShardingApplication {
+public class ApiRunner {
 
 	public static void main(String[] args) {
 		SpringApplication.run(
-				ShardingApplication.class
+				ApiRunner.class
 				, args);
 	}
 }
