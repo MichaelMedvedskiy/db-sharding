@@ -30,7 +30,7 @@ public class PaymentPersistController {
     @PostMapping
     public ResponseEntity<List<Payment>> getAllFirst(@RequestBody List<Payment> payments){
         shardingService.insertPayments(payments);
-        return ResponseEntity.status(HttpStatus.OK)
+        return ResponseEntity.status(HttpStatus.CREATED)
                 .body(
                         payments
                 );
