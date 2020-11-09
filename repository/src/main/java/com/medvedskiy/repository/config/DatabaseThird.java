@@ -17,6 +17,11 @@ import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import java.util.Properties;
 
+/**
+ * Third DB config for Payment entity
+ *
+ * @see com.medvedskiy.repository.dao.PaymentEntity
+ */
 @Configuration
 @PropertySource("classpath:application.properties")
 @EnableJpaRepositories(

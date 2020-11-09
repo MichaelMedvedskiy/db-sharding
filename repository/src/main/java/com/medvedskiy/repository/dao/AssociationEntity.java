@@ -1,18 +1,16 @@
 package com.medvedskiy.repository.dao;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+/**
+ * Association of sender and DB index for lookups for sharding rule preservation
+ */
 @Entity
-@Table(name="ASSOCIATION")
-public class Association {
+@Table(name = "ASSOCIATION")
+public class AssociationEntity {
 
     @Id
     @Column(name = "SENDER")

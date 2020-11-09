@@ -1,8 +1,8 @@
 package com.medvedskiy.core.services;
 
-import com.medvedskiy.repository.dao.Association;
+import com.medvedskiy.repository.dao.AssociationEntity;
 import com.medvedskiy.repository.dao.PaymentEntity;
-import com.medvedskiy.repository.repositories.association.AssociationDAORepository;
+import com.medvedskiy.repository.repositories.association.AssociationEntityRepository;
 import com.medvedskiy.repository.repositories.payment.db1.PaymentEntityDB1Repository;
 import com.medvedskiy.repository.repositories.payment.db2.PaymentEntityDB2Repository;
 import com.medvedskiy.repository.repositories.payment.db3.PaymentEntityDB3Repository;
@@ -11,10 +11,15 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Service for calculating total sum of payments by Sender Id
+ *
+ * @see com.medvedskiy.core.models.Payment
+ */
 @Service
 public class TotalSumService {
 
-    private final AssociationDAORepository associationDAORepository;
+    private final AssociationEntityRepository associationEntityRepository;
 
 
     private final PaymentEntityDB1Repository firstDatabasePaymentRepository;
@@ -25,7 +30,7 @@ public class TotalSumService {
 
 
     public TotalSumService(
-            AssociationDAORepository associationDAORepository,
+            AssociationEntityRepository associationEntityRepository,
 
             PaymentEntityDB1Repository firstDatabasePaymentRepository,
 
@@ -33,29 +38,34 @@ public class TotalSumService {
 
             PaymentEntityDB3Repository thirdDatabasePaymentRepository
     ) {
-        this.associationDAORepository = associationDAORepository;
+        this.associationEntityRepository = associationEntityRepository;
         this.firstDatabasePaymentRepository = firstDatabasePaymentRepository;
         this.secondDatabasePaymentRepository = secondDatabasePaymentRepository;
         this.thirdDatabasePaymentRepository = thirdDatabasePaymentRepository;
 
     }
 
+    /**
+     * @param senderId id of sender to get sum for
+     * @return total sum
+     */
     public Long calculateTotalSumBySender(
             Long senderId
     ) {
-        Association association = associationDAORepository.findOne(senderId);
-        if(association == null) {
+        AssociationEntity association = associationEntityRepository.findOne(senderId);
+        //if no record exists return 0
+        if (association == null) {
             return 0L;
         }
+        //get what db houses this sender's payments
         int dbIndex = association.getDbId();
         List<PaymentEntity> paymentsBySender = Collections.emptyList();
-        if(dbIndex == 0) {
+        //get sum
+        if (dbIndex == 0) {
             paymentsBySender = firstDatabasePaymentRepository.findPaymentsBySender(senderId);
-        }
-        else if(dbIndex == 1) {
+        } else if(dbIndex == 1) {
             paymentsBySender = secondDatabasePaymentRepository.findPaymentsBySender(senderId);
-        }
-        else if(dbIndex == 2) {
+        } else if(dbIndex == 2) {
             paymentsBySender = thirdDatabasePaymentRepository.findPaymentsBySender(senderId);
         }
         return paymentsBySender.stream().map(PaymentEntity::getPrice).reduce(0L, Long::sum);

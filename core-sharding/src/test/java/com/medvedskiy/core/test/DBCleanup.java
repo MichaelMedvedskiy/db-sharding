@@ -1,6 +1,6 @@
 package com.medvedskiy.core.test;
 
-import com.medvedskiy.repository.repositories.association.AssociationDAORepository;
+import com.medvedskiy.repository.repositories.association.AssociationEntityRepository;
 import com.medvedskiy.repository.repositories.payment.db1.PaymentEntityDB1Repository;
 import com.medvedskiy.repository.repositories.payment.db2.PaymentEntityDB2Repository;
 import com.medvedskiy.repository.repositories.payment.db3.PaymentEntityDB3Repository;
@@ -20,7 +20,7 @@ public class DBCleanup implements BeforeAllCallback, BeforeEachCallback, AfterAl
     PaymentEntityDB1Repository firstDBRepository;
     PaymentEntityDB2Repository secondDBRepository;
     PaymentEntityDB3Repository thirdDBRepository;
-    AssociationDAORepository associationDBRepository;
+    AssociationEntityRepository associationEntityRepository;
 
     AnnotationConfigApplicationContext context;
 
@@ -33,16 +33,16 @@ public class DBCleanup implements BeforeAllCallback, BeforeEachCallback, AfterAl
         firstDBRepository = context.getBean(PaymentEntityDB1Repository.class);
         secondDBRepository = context.getBean(PaymentEntityDB2Repository.class);
         thirdDBRepository = context.getBean(PaymentEntityDB3Repository.class);
-        associationDBRepository = context.getBean(AssociationDAORepository.class);
+        associationEntityRepository = context.getBean(AssociationEntityRepository.class);
     }
 
     @Override
-    public void beforeEach(ExtensionContext extensionContext) throws Exception {
+    public void beforeEach(ExtensionContext extensionContext) {
         cleanDB();
     }
 
     @Override
-    public void afterAll(ExtensionContext extensionContext) throws Exception {
+    public void afterAll(ExtensionContext extensionContext) {
         cleanDB();
         context.close();
     }
@@ -55,6 +55,6 @@ public class DBCleanup implements BeforeAllCallback, BeforeEachCallback, AfterAl
         firstDBRepository.deleteAll();
         secondDBRepository.deleteAll();
         thirdDBRepository.deleteAll();
-        associationDBRepository.deleteAll();
+        associationEntityRepository.deleteAll();
     }
 }

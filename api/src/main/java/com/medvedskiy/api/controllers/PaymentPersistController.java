@@ -2,11 +2,9 @@ package com.medvedskiy.api.controllers;
 
 import com.medvedskiy.core.models.Payment;
 import com.medvedskiy.core.services.ShardingService;
-import com.medvedskiy.repository.repositories.PaymentEntityRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +17,7 @@ import java.util.List;
 public class PaymentPersistController {
 
 
-    private ShardingService shardingService;
+    private final ShardingService shardingService;
 
     public PaymentPersistController(
             ShardingService shardingService

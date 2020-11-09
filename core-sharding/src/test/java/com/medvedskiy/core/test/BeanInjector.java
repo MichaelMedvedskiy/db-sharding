@@ -9,6 +9,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 
+/**
+ * Class for injection beans in tests, reading environment variables with @Value
+ */
 public class BeanInjector implements ParameterResolver, BeforeAllCallback {
 
     AnnotationConfigApplicationContext context;

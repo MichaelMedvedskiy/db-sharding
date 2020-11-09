@@ -8,6 +8,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * First Payment DB repository
+ */
 @Repository
 public interface PaymentEntityDB1Repository extends JpaRepository<PaymentEntity, Long> {
     @Query(value = "SELECT p FROM PaymentEntity p WHERE p.sender = ?1")

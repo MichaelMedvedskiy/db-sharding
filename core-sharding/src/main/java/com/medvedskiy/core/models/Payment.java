@@ -11,6 +11,9 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
+/**
+ * Payment model
+ */
 @Getter
 @Builder
 @AllArgsConstructor
@@ -22,13 +25,13 @@ import lombok.experimental.Accessors;
 public class Payment {
 
     @JsonProperty("sender")
-    private Long sender;
+    private final Long sender;
 
 
     @JsonProperty("receiver")
-    private Long receiver;
+    private final Long receiver;
 
 
     @JsonProperty("price")
-    private Long price;
+    private final Long price;
 }
