@@ -1,30 +1,26 @@
 package com.medvedskiy.repository;
 
-import com.medvedskiy.repository.dao.PersonDAO;
-import com.medvedskiy.repository.repositories.PersonRepository;
+import com.medvedskiy.repository.dao.PaymentEntity;
+import com.medvedskiy.repository.repositories.PaymentEntityRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-//@RestController
-//@RequestMapping(value = "/multiperson", produces = MediaType.APPLICATION_JSON_VALUE)
+
 public class TestController {
-    private PersonRepository firstRepository;
+    private PaymentEntityRepository firstRepository;
 
-    private  PersonRepository secondRepository;
+    private PaymentEntityRepository secondRepository;
 
-    private  PersonRepository thirdRepository;
+    private PaymentEntityRepository thirdRepository;
 
     public TestController(
-            @Qualifier("firstDBRepository") PersonRepository firstDBRepository,
-            @Qualifier("secondDBRepository") PersonRepository secondDBRepository,
-            @Qualifier("thirdDBRepository") PersonRepository thirdDBRepository
+            @Qualifier("firstDBRepository") PaymentEntityRepository firstDBRepository,
+            @Qualifier("secondDBRepository") PaymentEntityRepository secondDBRepository,
+            @Qualifier("thirdDBRepository") PaymentEntityRepository thirdDBRepository
     ) {
         this.firstRepository = firstDBRepository;
         this.secondRepository = secondDBRepository;
@@ -32,8 +28,8 @@ public class TestController {
     }
 
     @GetMapping("/first")
-    public ResponseEntity<List<PersonDAO>> getAllFirst(){
-        List<PersonDAO> list = (List<PersonDAO>) firstRepository.findAll();
+    public ResponseEntity<List<PaymentEntity>> getAllFirst(){
+        List<PaymentEntity> list = (List<PaymentEntity>) firstRepository.findAll();
         return ResponseEntity.status(HttpStatus.OK)
                 .body(
                         list
@@ -41,11 +37,11 @@ public class TestController {
     }
 
     @GetMapping("/second")
-    public Iterable<PersonDAO> getAllSecond(){
+    public Iterable<PaymentEntity> getAllSecond(){
         return secondRepository.findAll();
     }
     @GetMapping("/third")
-    public Iterable<PersonDAO> getAllThird(){
+    public Iterable<PaymentEntity> getAllThird(){
         return thirdRepository.findAll();
     }
 }

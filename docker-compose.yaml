@@ -50,3 +50,20 @@ services:
       && export POSTGRES_DB=$$DB_NAME
       && docker-entrypoint.sh postgres
       "
+
+  pg-3:
+    image: postgres:10.5
+    env_file:
+      - environment.env
+    ports:
+      - 8432:5432
+    volumes:
+      - ./association_db:/docker-entrypoint-initdb.d
+    entrypoint:
+      bash -c "
+      echo pg-start
+      && export POSTGRES_USER=$$DB_USER
+      && export POSTGRES_PASSWORD=$$DB_PASS
+      && export POSTGRES_DB=$$DB_NAME
+      && docker-entrypoint.sh postgres
+      "

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -22,17 +23,17 @@ import java.util.Properties;
 @PropertySource("classpath:database.properties")
 @EnableJpaRepositories(
         basePackages = "com.medvedskiy.repository",
-        entityManagerFactoryRef = "secondEntityManager",
-        transactionManagerRef = "secondTransactionManager")
-public class DatabaseSecond {
+        entityManagerFactoryRef = "associationEntityManager",
+        transactionManagerRef = "associationTransactionManager")
+public class AssociationDatabaseConfig {
 
-    @Value("${second.db.driver}")
+    @Value("${association.db.driver}")
     private String driver;
-    @Value("${second.db.url}")
+    @Value("${association.db.url}")
     private String url;
-    @Value("${second.db.username}")
+    @Value("${association.db.username}")
     private String username;
-    @Value("${second.db.password}")
+    @Value("${association.db.password}")
     private String password;
     @Value("${hibernate.dialect}")
     private String dialect;
@@ -45,8 +46,9 @@ public class DatabaseSecond {
     @Value("${connection.release_mode}")
     private String releaseMode;
 
-    @Bean(name = "secondDataSource")
-    public DataSource secondDataSource() {
+
+    @Bean(name = "associationDataSource")
+    public DataSource associationDataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName(driver);
         dataSource.setUrl(url);
@@ -55,16 +57,16 @@ public class DatabaseSecond {
         return dataSource;
     }
 
-    @Bean(name = "secondTransactionTemplate")
+    @Bean(name = "associationTransactionTemplate")
     public TransactionTemplate transactionTemplate(
-            @Qualifier("secondDataSource") DataSource dataSource
+            @Qualifier("associationDataSource") DataSource dataSource
     ) {
         return new TransactionTemplate(new DataSourceTransactionManager(dataSource));
     }
 
-    @Bean(name = "secondEntityManager")
-    public LocalContainerEntityManagerFactoryBean secondEntityManager(
-            @Qualifier("secondDataSource") DataSource dataSource
+    @Bean(name = "associationEntityManager")
+    public LocalContainerEntityManagerFactoryBean associationEntityManager(
+            @Qualifier("associationDataSource") DataSource dataSource
     ) {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(dataSource);
@@ -76,17 +78,19 @@ public class DatabaseSecond {
         return em;
     }
 
-    @Bean(name = "secondTransactionManager")
-    public PlatformTransactionManager secondTransactionManager(
-            @Qualifier("secondEntityManager") LocalContainerEntityManagerFactoryBean entityManager) {
+    @Bean(name = "associationTransactionManager")
+    public PlatformTransactionManager associationTransactionManager(
+            @Qualifier("associationEntityManager") LocalContainerEntityManagerFactoryBean associationEntityManager
+            ) {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
-        transactionManager.setEntityManagerFactory(entityManager.getObject());
+        transactionManager.setEntityManagerFactory(associationEntityManager.getObject());
         return transactionManager;
     }
 
-    @Bean(name = "secondSessionFactory")
-    public LocalSessionFactoryBean secondSessionFactory(
-            @Qualifier("secondDataSource") DataSource dataSource) {
+    @Bean(name = "associationSessionFactory")
+    public LocalSessionFactoryBean associationSessionFactory(
+            @Qualifier("associationDataSource") DataSource dataSource
+    ) {
         LocalSessionFactoryBean sessionFactoryBean = new LocalSessionFactoryBean();
         sessionFactoryBean.setDataSource(dataSource);
         sessionFactoryBean.setPackagesToScan(packageScan);
@@ -106,4 +110,3 @@ public class DatabaseSecond {
         return properties;
     }
 }
-

@@ -6,7 +6,11 @@
         <setting name="validation-enabled" value="true" />
         <setting name="provider-name" value="Hibernate" />
         <datasource-mapping>
-          <factory-entry name="entityManagerFactory" value="a3b94c04-3159-4e11-be69-3778afe13868" />
+          <factory-entry name="associationEntityManager" value="0e236a15-a834-4eec-bb89-968eb7ced0bb" />
+          <factory-entry name="entityManagerFactory" value="b4d10355-17c0-4b28-98db-9a22fc9f469c" />
+          <factory-entry name="firstEntityManager" />
+          <factory-entry name="secondEntityManager" />
+          <factory-entry name="thirdEntityManager" />
         </datasource-mapping>
         <naming-strategy-map />
       </configuration>
@@ -35,6 +39,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="core-sharding" />
     <orderEntry type="module" module-name="repository" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-data-jpa:1.4.3.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter:1.4.3.RELEASE" level="project" />
@@ -95,5 +100,6 @@
     <orderEntry type="library" name="Maven: org.springframework.plugin:spring-plugin-core:1.2.0.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.atteo:evo-inflector:1.2.1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.postgresql:postgresql:9.4.1212.jre7" level="project" />
+    <orderEntry type="library" name="Maven: javax.xml.bind:jaxb-api:2.3.0" level="project" />
   </component>
 </module>

@@ -1,5 +1,6 @@
 package com.medvedskiy.repository.config;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -7,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -14,12 +16,17 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.sql.DataSource;
 import java.util.Properties;
 
 @Configuration
 @PropertySource("classpath:database.properties")
+@EnableJpaRepositories(
+        basePackages = "com.medvedskiy.repository",
+        entityManagerFactoryRef = "firstEntityManager",
+        transactionManagerRef = "firstTransactionManager")
 public class DatabaseFirst {
 
     @Value("${first.db.driver}")
@@ -52,11 +59,21 @@ public class DatabaseFirst {
         return dataSource;
     }
 
+    @Bean(name = "firstTransactionTemplate")
+    @Primary
+    public TransactionTemplate transactionTemplate(
+            @Qualifier("firstDataSource") DataSource dataSource
+    ) {
+        return new TransactionTemplate(new DataSourceTransactionManager(dataSource));
+    }
+
     @Bean(name = "firstEntityManager")
     @Primary
-    public LocalContainerEntityManagerFactoryBean firstEntityManager() {
+    public LocalContainerEntityManagerFactoryBean firstEntityManager(
+            @Qualifier("firstDataSource") DataSource dataSource
+    ) {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
-        em.setDataSource(firstDataSource());
+        em.setDataSource(dataSource);
         em.setPackagesToScan(new String[] { packageScan });
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
@@ -67,17 +84,21 @@ public class DatabaseFirst {
 
     @Bean(name = "firstTransactionManager")
     @Primary
-    public PlatformTransactionManager firstTransactionManager() {
+    public PlatformTransactionManager firstTransactionManager(
+            @Qualifier("firstEntityManager") LocalContainerEntityManagerFactoryBean entityManager
+    ) {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
-        transactionManager.setEntityManagerFactory(firstEntityManager().getObject());
+        transactionManager.setEntityManagerFactory(entityManager.getObject());
         return transactionManager;
     }
 
     @Bean(name = "firstSessionFactory")
     @Primary
-    public LocalSessionFactoryBean firstSessionFactory() {
+    public LocalSessionFactoryBean firstSessionFactory(
+            @Qualifier("firstDataSource") DataSource dataSource
+    ) {
         LocalSessionFactoryBean sessionFactoryBean = new LocalSessionFactoryBean();
-        sessionFactoryBean.setDataSource(firstDataSource());
+        sessionFactoryBean.setDataSource(dataSource);
         sessionFactoryBean.setPackagesToScan(packageScan);
         sessionFactoryBean.setHibernateProperties(hibernateProperties());
         return sessionFactoryBean;

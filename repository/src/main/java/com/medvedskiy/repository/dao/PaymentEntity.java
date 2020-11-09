@@ -13,11 +13,10 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name="PAYMENT")
-public class PersonDAO {
+public class PaymentEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="payment_id_seq")
-    @SequenceGenerator(name="payment_id_seq", sequenceName="payment_id_seq", allocationSize=1)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID")
     @JsonProperty("id")
     private Long id;
@@ -34,4 +33,19 @@ public class PersonDAO {
     @JsonProperty("price")
     private Long price;
 
+    public void setPrice(Long price) {
+        this.price = price;
+    }
+
+    public void setReceiver(Long receiver) {
+        this.receiver = receiver;
+    }
+
+    public void setSender(Long sender) {
+        this.sender = sender;
+    }
+
+    public Long getPrice() {
+        return price;
+    }
 }
