@@ -1,4 +1,4 @@
-package com.medvedskiy.core.test;
+package com.medvedskiy.core.util;
 
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 

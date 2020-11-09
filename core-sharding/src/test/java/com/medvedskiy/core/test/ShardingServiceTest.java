@@ -4,6 +4,8 @@ import com.medvedskiy.core.config.CoreConfig;
 import com.medvedskiy.core.exceptions.UndefinedBehaviorException;
 import com.medvedskiy.core.models.Payment;
 import com.medvedskiy.core.services.ShardingService;
+import com.medvedskiy.core.util.BeanInjector;
+import com.medvedskiy.core.util.DBCleanup;
 import com.medvedskiy.repository.repositories.payment.db1.PaymentEntityDB1Repository;
 import com.medvedskiy.repository.repositories.payment.db2.PaymentEntityDB2Repository;
 import com.medvedskiy.repository.repositories.payment.db3.PaymentEntityDB3Repository;

@@ -1,4 +1,4 @@
-package com.medvedskiy.core.test;
+package com.medvedskiy.core.util;
 
 import com.medvedskiy.repository.repositories.association.AssociationEntityRepository;
 import com.medvedskiy.repository.repositories.payment.db1.PaymentEntityDB1Repository;
