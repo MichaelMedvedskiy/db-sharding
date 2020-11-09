@@ -1,6 +1,7 @@
 package com.medvedskiy.core;
 
 import com.medvedskiy.core.config.CoreConfig;
+import com.medvedskiy.core.exceptions.UndefinedBehaviorException;
 import com.medvedskiy.core.services.ShardingService;
 import com.medvedskiy.repository.dao.PaymentEntity;
 import com.medvedskiy.repository.repositories.PaymentEntityRepository;
@@ -14,7 +15,7 @@ import java.util.List;
 
 @Transactional
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws UndefinedBehaviorException {
 
         ApplicationContext context = new AnnotationConfigApplicationContext(CoreConfig.class);
 

@@ -1,5 +1,6 @@
 package com.medvedskiy.core.config;
 
+import com.medvedskiy.repository.config.ChainedTransactionConfig;
 import com.medvedskiy.repository.config.RepositoriesConfig;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -9,7 +10,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
-@Import(RepositoriesConfig.class)
+@Import({RepositoriesConfig.class, ChainedTransactionConfig.class})
 @ComponentScan("com.medvedskiy.core.services")
 @EnableTransactionManagement
 @EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})

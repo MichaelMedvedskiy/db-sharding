@@ -1,19 +1,18 @@
-
 -- Удаляем базу данных если она есть
-DROP DATABASE IF EXISTS association;
+DROP DATABASE IF EXISTS associations;
 
 -- И создаём её заново
-CREATE DATABASE association;
+CREATE DATABASE associations;
 
 
 -- Установка базы данных по умолчанию
-\c association;
+\c associations;
 
 CREATE SEQUENCE hibernate_sequence START 1;
 
 CREATE TABLE ASSOCIATION
 (
-    SENDER   bigint   NOT NULL,
+    SENDER   bigint NOT NULL,
     DBID     int   NOT NULL,
     PRIMARY KEY (SENDER)
 );

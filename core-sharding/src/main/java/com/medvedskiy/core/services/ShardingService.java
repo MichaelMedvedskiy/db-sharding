@@ -1,14 +1,16 @@
 package com.medvedskiy.core.services;
 
 
+import com.medvedskiy.core.exceptions.UndefinedBehaviorException;
 import com.medvedskiy.repository.dao.Association;
 import com.medvedskiy.repository.dao.PaymentEntity;
-import com.medvedskiy.repository.repositories.AssociationDAORepository;
-import com.medvedskiy.repository.repositories.PaymentEntityRepository;
-import org.springframework.beans.factory.annotation.Qualifier;
+import com.medvedskiy.repository.repositories.association.AssociationDAORepository;
+import com.medvedskiy.repository.repositories.payment.db1.PaymentEntityDB1Repository;
+import com.medvedskiy.repository.repositories.payment.db2.PaymentEntityDB2Repository;
+import com.medvedskiy.repository.repositories.payment.db3.PaymentEntityDB3Repository;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,38 +30,21 @@ public class ShardingService {
 
     private final ConverterService converterService;
 
-    private final PaymentEntityRepository firstDatabasePaymentRepository;
+    private final PaymentEntityDB1Repository firstDatabasePaymentRepository;
 
-    private final PaymentEntityRepository secondDatabasePaymentRepository;
+    private final PaymentEntityDB2Repository secondDatabasePaymentRepository;
 
-    private final PaymentEntityRepository thirdDatabasePaymentRepository;
+    private final PaymentEntityDB3Repository thirdDatabasePaymentRepository;
 
-    private final TransactionTemplate firstTemplate;
 
-    private final TransactionTemplate secondTemplate;
-
-    private final TransactionTemplate thirdTemplate;
-
-    private final TransactionTemplate associationTemplate;
 
     public ShardingService(
-            @Qualifier("associationDBRepository")
-                    AssociationDAORepository associationDAORepository,
+            AssociationDAORepository associationDAORepository,
             ConverterService converterService,
-            @Qualifier("firstDBRepository")
-                    PaymentEntityRepository firstDatabasePaymentRepository,
-            @Qualifier("secondDBRepository")
-                    PaymentEntityRepository secondDatabasePaymentRepository,
-            @Qualifier("thirdDBRepository")
-                    PaymentEntityRepository thirdDatabasePaymentRepository,
-            @Qualifier("firstTransactionTemplate")
-                    TransactionTemplate firstTemplate,
-            @Qualifier("secondTransactionTemplate")
-                    TransactionTemplate secondTemplate,
-            @Qualifier("thirdTransactionTemplate")
-                    TransactionTemplate thirdTemplate,
-            @Qualifier("associationTransactionTemplate")
-                    TransactionTemplate associationTemplate
+            PaymentEntityDB1Repository firstDatabasePaymentRepository,
+            PaymentEntityDB2Repository secondDatabasePaymentRepository,
+            PaymentEntityDB3Repository thirdDatabasePaymentRepository
+
     ) {
         this.associationDAORepository = associationDAORepository;
         this.converterService = converterService;
@@ -67,18 +52,14 @@ public class ShardingService {
         this.secondDatabasePaymentRepository = secondDatabasePaymentRepository;
         this.thirdDatabasePaymentRepository = thirdDatabasePaymentRepository;
 
-        this.firstTemplate = firstTemplate;
-        this.secondTemplate = secondTemplate;
-        this.thirdTemplate = thirdTemplate;
-        this.associationTemplate = associationTemplate;
     }
 
     // TODO: 08.11.2020 make env var
     private final int databaseCount = 3;
 
-    public boolean insertPayments(List<com.medvedskiy.core.models.Payment> payments) {
+    public boolean insertPayments(List<com.medvedskiy.core.models.Payment> payments) throws UndefinedBehaviorException {
         Map<Long, List<com.medvedskiy.core.models.Payment>> clusterizedPayments = clusterizePayments(payments);
-        Set<Long> passedSenderIds = clusterizedPayments.keySet();
+        Set<Long> passedSenderIds = new HashSet<>(clusterizedPayments.keySet());
 
         Map<Long, Integer> existingSenderIdsIndexed = getDbIndexesForExistingSenders(clusterizedPayments.keySet());
         passedSenderIds.removeAll(existingSenderIdsIndexed.keySet());
@@ -91,23 +72,48 @@ public class ShardingService {
                 existingSenderIdsIndexed.entrySet().stream(),
                 newSenderIdsIndexes.entrySet().stream()).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        Map<Integer, List<com.medvedskiy.core.models.Payment>> listsForDatabases = mergeClustersForInsert(clusterizedPayments, allSenderIdsIndexes);
+        long greatestDBIndex = allSenderIdsIndexes.values().stream().max(Integer::compareTo).orElseThrow();
+
+        if (greatestDBIndex > databaseCount - 1) {
+            throw new UndefinedBehaviorException(String.format("Scheduled pasting in db#%d, but max db index is %d",
+                    greatestDBIndex, databaseCount - 1));
+        }
+
+        Map<Integer, List<com.medvedskiy.core.models.Payment>> listsForDatabases =
+                mergeClustersForInsert(clusterizedPayments, allSenderIdsIndexes);
 
         List<PaymentEntity> listForFirstDb = converterService.paymentDAOWrapper(listsForDatabases.get(0));
-        if (!listForFirstDb.isEmpty()) {
-            firstTemplate.execute(status -> firstDatabasePaymentRepository.save(listForFirstDb));
-        }
+        persistInDB1(listForFirstDb);
+
         List<PaymentEntity> listForSecondDb = converterService.paymentDAOWrapper(listsForDatabases.get(1));
-        if (!listForSecondDb.isEmpty()) {
-            secondTemplate.execute(status -> secondDatabasePaymentRepository.save(listForSecondDb));
-        }
+        persistInDB2(listForSecondDb);
+
         List<PaymentEntity> listForThirdDb = converterService.paymentDAOWrapper(listsForDatabases.get(2));
-        if (!listForThirdDb.isEmpty()) {
-            thirdTemplate.execute(status -> thirdDatabasePaymentRepository.save(listForThirdDb));
-        }
+        persistInDB3(listForThirdDb);
+
         return true;
     }
 
+    @Transactional("firstTransactionManager")
+    public void persistInDB1(List<PaymentEntity> toInsert) {
+        if (!toInsert.isEmpty()) {
+            firstDatabasePaymentRepository.save(toInsert);
+        }
+    }
+
+    @Transactional("secondTransactionManager")
+    public void persistInDB2(List<PaymentEntity> toInsert) {
+        if (!toInsert.isEmpty()) {
+            secondDatabasePaymentRepository.save(toInsert);
+        }
+    }
+
+    @Transactional("thirdTransactionManager")
+    public void persistInDB3(List<PaymentEntity> toInsert) {
+        if (!toInsert.isEmpty()) {
+            thirdDatabasePaymentRepository.save(toInsert);
+        }
+    }
 
     public Map<Long, List<com.medvedskiy.core.models.Payment>> clusterizePayments(List<com.medvedskiy.core.models.Payment> inputPayments) {
         Map<Long, List<com.medvedskiy.core.models.Payment>> clustersBySender = new HashMap<>();
@@ -157,12 +163,12 @@ public class ShardingService {
     }
 
     private Map<Long, Integer> getDbIndexesForNewSenders(Iterable<Long> senderIds) {
-        Map<Long, Integer> senderIndex = new HashMap<>();
+        Map<Long, Integer> senderIndexes = new HashMap<>();
         for (Long senderId : senderIds) {
             int dbId = senderId.intValue() % databaseCount;
-            senderIndex.put(senderId, dbId);
+            senderIndexes.put(senderId, dbId);
         }
-        return senderIndex;
+        return senderIndexes;
     }
 
     void associateSendersWithDatabase(Map<Long, Integer> dbIndexesForNewSenders) {
@@ -173,8 +179,15 @@ public class ShardingService {
             association.setDbId(senderIndex.getValue());
             associationEntities.add(association);
         }
+        persistInDBAssociation(associationEntities);
+        //associationTemplate.execute(status ->);
+    }
 
-        associationTemplate.execute(status -> associationDAORepository.save(associationEntities));
+    @Transactional("associationTransactionManager")
+    public void persistInDBAssociation(List<Association> toInsert) {
+        if (!toInsert.isEmpty()) {
+            associationDAORepository.save(toInsert);
+        }
     }
 
 

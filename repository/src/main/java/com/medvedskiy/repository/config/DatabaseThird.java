@@ -6,24 +6,24 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import java.util.Properties;
 
 @Configuration
-@PropertySource("classpath:database.properties")
+@PropertySource("classpath:application.properties")
 @EnableJpaRepositories(
-        basePackages = "com.medvedskiy.repository",
+        basePackages = "com.medvedskiy.repository.repositories.payment.db3",
         entityManagerFactoryRef = "thirdEntityManager",
         transactionManagerRef = "thirdTransactionManager")
+@EnableTransactionManagement
 public class DatabaseThird {
 
     @Value("${third.db.driver}")
@@ -45,7 +45,8 @@ public class DatabaseThird {
     @Value("${connection.release_mode}")
     private String releaseMode;
 
-    @Bean(name = "thirdDataSource")
+
+    @Bean
     public DataSource thirdDataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName(driver);
@@ -61,7 +62,7 @@ public class DatabaseThird {
     ) {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(dataSource);
-        em.setPackagesToScan(new String[] { packageScan });
+        em.setPackagesToScan(packageScan);
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
         em.setJpaProperties(hibernateProperties());
@@ -69,31 +70,13 @@ public class DatabaseThird {
         return em;
     }
 
-    @Bean(name = "thirdTransactionTemplate")
-    public TransactionTemplate transactionTemplate(
-            @Qualifier("thirdDataSource") DataSource dataSource
-    ) {
-        return new TransactionTemplate(new DataSourceTransactionManager(dataSource));
-    }
 
     @Bean(name = "thirdTransactionManager")
     public PlatformTransactionManager thirdTransactionManager(
-            @Qualifier("thirdEntityManager") LocalContainerEntityManagerFactoryBean entityManager
+            @Qualifier("thirdEntityManager") EntityManagerFactory thirdEntityManager
     ) {
-        JpaTransactionManager transactionManager = new JpaTransactionManager();
-        transactionManager.setEntityManagerFactory(entityManager.getObject());
-        return transactionManager;
-    }
+        return new JpaTransactionManager(thirdEntityManager);
 
-    @Bean(name = "thirdSessionFactory")
-    public LocalSessionFactoryBean thirdSessionFactory(
-            @Qualifier("thirdDataSource") DataSource dataSource
-    ) {
-        LocalSessionFactoryBean sessionFactoryBean = new LocalSessionFactoryBean();
-        sessionFactoryBean.setDataSource(dataSource);
-        sessionFactoryBean.setPackagesToScan(packageScan);
-        sessionFactoryBean.setHibernateProperties(hibernateProperties());
-        return sessionFactoryBean;
     }
 
     private Properties hibernateProperties() {

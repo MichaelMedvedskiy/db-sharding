@@ -2,9 +2,10 @@ package com.medvedskiy.core.services;
 
 import com.medvedskiy.repository.dao.Association;
 import com.medvedskiy.repository.dao.PaymentEntity;
-import com.medvedskiy.repository.repositories.AssociationDAORepository;
-import com.medvedskiy.repository.repositories.PaymentEntityRepository;
-import org.springframework.beans.factory.annotation.Qualifier;
+import com.medvedskiy.repository.repositories.association.AssociationDAORepository;
+import com.medvedskiy.repository.repositories.payment.db1.PaymentEntityDB1Repository;
+import com.medvedskiy.repository.repositories.payment.db2.PaymentEntityDB2Repository;
+import com.medvedskiy.repository.repositories.payment.db3.PaymentEntityDB3Repository;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -16,22 +17,21 @@ public class TotalSumService {
     private final AssociationDAORepository associationDAORepository;
 
 
-    private final PaymentEntityRepository firstDatabasePaymentRepository;
+    private final PaymentEntityDB1Repository firstDatabasePaymentRepository;
 
-    private final PaymentEntityRepository secondDatabasePaymentRepository;
+    private final PaymentEntityDB2Repository secondDatabasePaymentRepository;
 
-    private final PaymentEntityRepository thirdDatabasePaymentRepository;
+    private final PaymentEntityDB3Repository thirdDatabasePaymentRepository;
 
 
     public TotalSumService(
-            @Qualifier("associationDBRepository")
-                    AssociationDAORepository associationDAORepository,
-            @Qualifier("firstDBRepository")
-                    PaymentEntityRepository firstDatabasePaymentRepository,
-            @Qualifier("secondDBRepository")
-                    PaymentEntityRepository secondDatabasePaymentRepository,
-            @Qualifier("thirdDBRepository")
-                    PaymentEntityRepository thirdDatabasePaymentRepository
+            AssociationDAORepository associationDAORepository,
+
+            PaymentEntityDB1Repository firstDatabasePaymentRepository,
+
+            PaymentEntityDB2Repository secondDatabasePaymentRepository,
+
+            PaymentEntityDB3Repository thirdDatabasePaymentRepository
     ) {
         this.associationDAORepository = associationDAORepository;
         this.firstDatabasePaymentRepository = firstDatabasePaymentRepository;
