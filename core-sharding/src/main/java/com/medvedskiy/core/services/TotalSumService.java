@@ -6,6 +6,7 @@ import com.medvedskiy.repository.repositories.association.AssociationEntityRepos
 import com.medvedskiy.repository.repositories.payment.db1.PaymentEntityDB1Repository;
 import com.medvedskiy.repository.repositories.payment.db2.PaymentEntityDB2Repository;
 import com.medvedskiy.repository.repositories.payment.db3.PaymentEntityDB3Repository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -16,6 +17,7 @@ import java.util.List;
  *
  * @see com.medvedskiy.core.models.Payment
  */
+@Slf4j
 @Service
 public class TotalSumService {
 
@@ -52,6 +54,7 @@ public class TotalSumService {
     public Long calculateTotalSumBySender(
             Long senderId
     ) {
+        log.info("Getting total sum for SenderId: {}", senderId);
         AssociationEntity association = associationEntityRepository.findOne(senderId);
         //if no record exists return 0
         if (association == null) {

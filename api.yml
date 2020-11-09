@@ -36,7 +36,7 @@ paths:
 
   /total/sender/{id}:
     get:
-      summary: сохранить список платежей
+      summary: получить сумму платежей по id отправителя
       tags:
         - total sum
       parameters:
@@ -47,14 +47,13 @@ paths:
             type: long
           description: ID отправителя
       responses:
-        '201':
+        '200':
           description: Ok
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/TotalSum"
+                $ref: "#/components/schemas/TotalSum"
+
         '400':
           "$ref": "#/components/responses/BadRequest"
         '500':
@@ -74,11 +73,11 @@ components:
         receiver:
           nullable: false
           type: long
-          description: id отправителя
+          description: id получателя
         price:
           nullable: false
           type: long
-          description: id отправителя
+          description: сумма
 
     TotalSum:
       description: платёж

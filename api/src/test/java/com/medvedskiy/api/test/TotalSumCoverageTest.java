@@ -38,16 +38,16 @@ public class TotalSumCoverageTest {
         //so context was able to start
         Thread.sleep(2000);
 
-        String json = FileAsString.getFile("payments2.json");
-
-        List<Payment> payments = mapper.readValue(json, new TypeReference<List<Payment>>() {});
-
         RestTemplate restTemplate = new RestTemplate();
 
+        String json = FileAsString.getFile("payments2.json");
+
+        //persist payments
+        List<Payment> payments = mapper.readValue(json, new TypeReference<List<Payment>>() {});
         HttpEntity<List<Payment>> request = new HttpEntity<>(payments);
         restTemplate.postForObject("http://localhost:8080/api/v1/payment", request, Object.class);
 
-
+        //get sums by ids
         ResponseEntity<TotalSumWrapper> sumForSenderIdMinus1
                 = restTemplate.getForEntity("http://localhost:8080/api/v1/total/sender" + "/-1", TotalSumWrapper.class);
         Assertions.assertEquals(sumForSenderIdMinus1.getBody().totalSum(), 0);

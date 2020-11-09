@@ -2,7 +2,9 @@ package com.medvedskiy.api.exceptions;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
+/**
+ * Error class for HTTP response
+ */
 public class Error {
 
     @JsonProperty("code")

@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-
+/**
+ * Handling exceptions thrown during HTTP request processing
+ */
 @ControllerAdvice
 public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
     Logger log = LoggerFactory.getLogger(ExceptionHandlerController.class);
