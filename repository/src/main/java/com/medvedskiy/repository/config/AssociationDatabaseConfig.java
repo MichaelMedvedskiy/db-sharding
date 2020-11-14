@@ -1,6 +1,5 @@
 package com.medvedskiy.repository.config;
 
-import com.medvedskiy.repository.dao.AssociationEntity;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -21,10 +20,9 @@ import java.util.Properties;
 /**
  * DB config for Association entities
  *
- * @see AssociationEntity
  */
 @Configuration
-@PropertySource("classpath:application.properties")
+@PropertySource("classpath:associationDB.properties")
 @EnableJpaRepositories(
         basePackages = "com.medvedskiy.repository.repositories.association",
         entityManagerFactoryRef = "associationEntityManager",

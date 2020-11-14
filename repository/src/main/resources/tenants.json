@@ -1,0 +1,37 @@
+[
+  {
+    "tenant": 0,
+    "dataSourceClassName": "org.postgresql.ds.PGSimpleDataSource",
+    "url": "jdbc:postgresql://127.0.0.1:5432/payments",
+    "user": "postgres",
+    "password": "postgres"
+  },
+  {
+    "tenant": 1,
+    "dataSourceClassName": "org.postgresql.ds.PGSimpleDataSource",
+    "url": "jdbc:postgresql://127.0.0.1:5433/payments",
+    "user": "postgres",
+    "password": "postgres"
+  },
+  {
+    "tenant": 2,
+    "dataSourceClassName": "org.postgresql.ds.PGSimpleDataSource",
+    "url": "jdbc:postgresql://127.0.0.1:5434/payments",
+    "user": "postgres",
+    "password": "postgres"
+  },
+  {
+    "tenant": 3,
+    "dataSourceClassName": "org.postgresql.ds.PGSimpleDataSource",
+    "url": "jdbc:postgresql://127.0.0.1:5435/payments",
+    "user": "postgres",
+    "password": "postgres"
+  },
+  {
+    "tenant": 4,
+    "dataSourceClassName": "org.postgresql.ds.PGSimpleDataSource",
+    "url": "jdbc:postgresql://127.0.0.1:5436/payments",
+    "user": "postgres",
+    "password": "postgres"
+  }
+]

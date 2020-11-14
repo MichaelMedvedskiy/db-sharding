@@ -1,25 +1,20 @@
 package com.medvedskiy.core.util;
 
 import com.medvedskiy.repository.repositories.association.AssociationEntityRepository;
-import com.medvedskiy.repository.repositories.payment.db1.PaymentEntityDB1Repository;
-import com.medvedskiy.repository.repositories.payment.db2.PaymentEntityDB2Repository;
-import com.medvedskiy.repository.repositories.payment.db3.PaymentEntityDB3Repository;
+import com.medvedskiy.repository.repositories.payment.PaymentEntityRepository;
+import com.medvedskiy.repository.tenanting.ThreadLocalStorage;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.transaction.annotation.Transactional;
-
 /**
  * Class for database cleanup managements
  */
 public class DBCleanup implements BeforeAllCallback, BeforeEachCallback, AfterAllCallback {
 
-    PaymentEntityDB1Repository firstDBRepository;
-    PaymentEntityDB2Repository secondDBRepository;
-    PaymentEntityDB3Repository thirdDBRepository;
+    PaymentEntityRepository paymentEntityRepository;
     AssociationEntityRepository associationEntityRepository;
 
     AnnotationConfigApplicationContext context;
@@ -30,9 +25,7 @@ public class DBCleanup implements BeforeAllCallback, BeforeEachCallback, AfterAl
                 new AnnotationConfigApplicationContext(
                         extensionContext.getTestClass().orElseThrow().getAnnotation(ContextConfiguration.class).classes()
                 );
-        firstDBRepository = context.getBean(PaymentEntityDB1Repository.class);
-        secondDBRepository = context.getBean(PaymentEntityDB2Repository.class);
-        thirdDBRepository = context.getBean(PaymentEntityDB3Repository.class);
+        paymentEntityRepository = context.getBean(PaymentEntityRepository.class);
         associationEntityRepository = context.getBean(AssociationEntityRepository.class);
     }
 
@@ -50,11 +43,17 @@ public class DBCleanup implements BeforeAllCallback, BeforeEachCallback, AfterAl
     /**
      * deletes all from all 4 databases
      */
-    @Transactional("chainedTransactionManager")
     void cleanDB() {
-        firstDBRepository.deleteAll();
-        secondDBRepository.deleteAll();
-        thirdDBRepository.deleteAll();
+//
+//        firstDBRepository.deleteAll();
+//        secondDBRepository.deleteAll();
+//        thirdDBRepository.deleteAll();
+        int databaseCount = ThreadLocalStorage.getDatabaseCount();
+        for (int i = 0; i < databaseCount; i++) {
+            ThreadLocalStorage.setTenantName(String.valueOf(i));
+            paymentEntityRepository.deleteAll();
+        }
+
         associationEntityRepository.deleteAll();
     }
 }

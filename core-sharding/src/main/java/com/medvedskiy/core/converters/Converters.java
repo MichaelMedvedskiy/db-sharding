@@ -1,25 +1,25 @@
-package com.medvedskiy.core.services;
+package com.medvedskiy.core.converters;
 
-import com.medvedskiy.repository.dao.PaymentEntity;
-import org.springframework.stereotype.Service;
+import com.medvedskiy.core.models.Payment;
+import com.medvedskiy.repository.dao.payment.PaymentEntity;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * Service for conversion of model to its Persistence representation
  */
-@Service
-public class ConverterService {
+public class Converters {
 
     /**
-     * Converts List of Payment to List of PaymentEntity
+     * Converts Iterable of Payment to List of PaymentEntity
      *
      * @param payments
      * @return converted list
      */
-    public List<PaymentEntity> paymentDAOWrapper(List<com.medvedskiy.core.models.Payment> payments) {
-        return payments.stream().map(
+    public static List<PaymentEntity> paymentDAOWrapper(Iterable<Payment> payments) {
+        return StreamSupport.stream(payments.spliterator(), false).map(
                 payment -> {
                     PaymentEntity paymentEntityDAO = new PaymentEntity();
                     paymentEntityDAO.setPrice(payment.price());

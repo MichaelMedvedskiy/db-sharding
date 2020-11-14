@@ -1,4 +1,4 @@
-package com.medvedskiy.repository.dao;
+package com.medvedskiy.repository.dao.association;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -21,6 +21,10 @@ public class AssociationEntity {
 
     public Integer getDbId() {
         return this.dbId;
+    }
+
+    public Long getSender() {
+        return sender;
     }
 
     public void setSender(Long sender) {

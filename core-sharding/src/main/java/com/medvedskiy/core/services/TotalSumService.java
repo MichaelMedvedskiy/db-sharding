@@ -1,11 +1,10 @@
 package com.medvedskiy.core.services;
 
-import com.medvedskiy.repository.dao.AssociationEntity;
-import com.medvedskiy.repository.dao.PaymentEntity;
+import com.medvedskiy.repository.dao.association.AssociationEntity;
+import com.medvedskiy.repository.dao.payment.PaymentEntity;
 import com.medvedskiy.repository.repositories.association.AssociationEntityRepository;
-import com.medvedskiy.repository.repositories.payment.db1.PaymentEntityDB1Repository;
-import com.medvedskiy.repository.repositories.payment.db2.PaymentEntityDB2Repository;
-import com.medvedskiy.repository.repositories.payment.db3.PaymentEntityDB3Repository;
+import com.medvedskiy.repository.repositories.payment.PaymentEntityRepository;
+import com.medvedskiy.repository.tenanting.ThreadLocalStorage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -23,27 +22,15 @@ public class TotalSumService {
 
     private final AssociationEntityRepository associationEntityRepository;
 
-
-    private final PaymentEntityDB1Repository firstDatabasePaymentRepository;
-
-    private final PaymentEntityDB2Repository secondDatabasePaymentRepository;
-
-    private final PaymentEntityDB3Repository thirdDatabasePaymentRepository;
-
+    private final PaymentEntityRepository paymentEntityRepository;
 
     public TotalSumService(
             AssociationEntityRepository associationEntityRepository,
 
-            PaymentEntityDB1Repository firstDatabasePaymentRepository,
-
-            PaymentEntityDB2Repository secondDatabasePaymentRepository,
-
-            PaymentEntityDB3Repository thirdDatabasePaymentRepository
+            PaymentEntityRepository paymentEntityRepository
     ) {
         this.associationEntityRepository = associationEntityRepository;
-        this.firstDatabasePaymentRepository = firstDatabasePaymentRepository;
-        this.secondDatabasePaymentRepository = secondDatabasePaymentRepository;
-        this.thirdDatabasePaymentRepository = thirdDatabasePaymentRepository;
+        this.paymentEntityRepository = paymentEntityRepository;
 
     }
 
@@ -55,7 +42,7 @@ public class TotalSumService {
             Long senderId
     ) {
         log.info("Getting total sum for SenderId: {}", senderId);
-        AssociationEntity association = associationEntityRepository.findOne(senderId);
+        AssociationEntity association = associationEntityRepository.findById(senderId).orElse(null);
         //if no record exists return 0
         if (association == null) {
             return 0L;
@@ -63,14 +50,9 @@ public class TotalSumService {
         //get what db houses this sender's payments
         int dbIndex = association.getDbId();
         List<PaymentEntity> paymentsBySender = Collections.emptyList();
-        //get sum
-        if (dbIndex == 0) {
-            paymentsBySender = firstDatabasePaymentRepository.findPaymentsBySender(senderId);
-        } else if(dbIndex == 1) {
-            paymentsBySender = secondDatabasePaymentRepository.findPaymentsBySender(senderId);
-        } else if(dbIndex == 2) {
-            paymentsBySender = thirdDatabasePaymentRepository.findPaymentsBySender(senderId);
-        }
+        ThreadLocalStorage.setTenantName(String.valueOf(dbIndex));
+        paymentsBySender = paymentEntityRepository.findPaymentsBySender(senderId);
         return paymentsBySender.stream().map(PaymentEntity::getPrice).reduce(0L, Long::sum);
+
     }
 }

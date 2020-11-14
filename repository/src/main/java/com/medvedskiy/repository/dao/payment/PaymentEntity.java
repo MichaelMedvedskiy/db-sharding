@@ -1,5 +1,4 @@
-package com.medvedskiy.repository.dao;
-
+package com.medvedskiy.repository.dao.payment;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -43,5 +42,17 @@ public class PaymentEntity {
 
     public Long getPrice() {
         return price;
+    }
+
+    public Long getReceiver() {
+        return receiver;
+    }
+
+    public Long getSender() {
+        return sender;
+    }
+
+    public Long getId() {
+        return id;
     }
 }

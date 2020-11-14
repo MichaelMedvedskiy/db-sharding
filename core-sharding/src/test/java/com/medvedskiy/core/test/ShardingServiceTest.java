@@ -1,19 +1,18 @@
 package com.medvedskiy.core.test;
 
 import com.medvedskiy.core.config.CoreConfig;
-import com.medvedskiy.core.exceptions.UndefinedBehaviorException;
 import com.medvedskiy.core.models.Payment;
 import com.medvedskiy.core.services.ShardingService;
 import com.medvedskiy.core.util.BeanInjector;
 import com.medvedskiy.core.util.DBCleanup;
-import com.medvedskiy.repository.repositories.payment.db1.PaymentEntityDB1Repository;
-import com.medvedskiy.repository.repositories.payment.db2.PaymentEntityDB2Repository;
-import com.medvedskiy.repository.repositories.payment.db3.PaymentEntityDB3Repository;
+import com.medvedskiy.repository.repositories.payment.PaymentEntityRepository;
+import com.medvedskiy.repository.tenanting.ThreadLocalStorage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -36,22 +35,37 @@ public class ShardingServiceTest {
     @Test
     public void testSharding(
             ShardingService shardingService,
-            PaymentEntityDB1Repository db1Repository,
-            PaymentEntityDB2Repository db2Repository,
-            PaymentEntityDB3Repository db3Repository
-    ) throws UndefinedBehaviorException {
+            PaymentEntityRepository paymentEntityRepository
+    ) throws Exception {
+        //todo: from env
+        int databaseCount = ThreadLocalStorage.getDatabaseCount();
 
         for (long i = 0; i < rnd(99) + 10; i++) {
             shardingService.insertPayments(rndPaymentList());
         }
-
-        Set<Long> idsFromDB1 = db1Repository.findUniqueSenderIds();
-        Set<Long> idsFromDB2 = db2Repository.findUniqueSenderIds();
-        Set<Long> idsFromDB3 = db3Repository.findUniqueSenderIds();
-
-        if (idsFromDB1.stream().anyMatch(idsFromDB2::contains) || idsFromDB2.stream().anyMatch(idsFromDB3::contains)) {
-            throw new RuntimeException("Failed Sharding");
+        List<Set<Long>> idsInEachDb = new ArrayList<>();
+        for (int i = 0; i < databaseCount; i++) {
+            ThreadLocalStorage.setTenantName(String.valueOf(i));
+            idsInEachDb.add(paymentEntityRepository.findUniqueSenderIds());
         }
+
+        int totalItemCount = 0;
+        HashSet<Long> allSetsMerged = new HashSet<>();
+        for (Set<Long> set : idsInEachDb) {
+            for (Long item : set) {
+                totalItemCount += 1;
+                allSetsMerged.add(item);
+            }
+        }
+        if (totalItemCount != allSetsMerged.size()) {
+            throw new Exception("Total count of IDs and count of unique ids from all DBs did not match, sharding failed");
+        }
+
+
+        //todo: database count from tenants, add DBCleanup, MOOOOVE
+//        if (idsFromDB1.stream().anyMatch(idsFromDB2::contains) || idsFromDB2.stream().anyMatch(idsFromDB3::contains)) {
+//            throw new RuntimeException("Failed Sharding");
+//        }
         System.out.println(1231);
     }
 
