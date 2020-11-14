@@ -3,11 +3,12 @@ package com.medvedskiy.core.test;
 import com.medvedskiy.core.config.CoreConfig;
 import com.medvedskiy.core.models.Payment;
 import com.medvedskiy.core.services.ShardingService;
-import com.medvedskiy.core.test.config.TestPaymentDatasourceConfig;
-import com.medvedskiy.core.util.BeanInjector;
-import com.medvedskiy.core.util.DBCleanup;
 import com.medvedskiy.repository.repositories.payment.PaymentEntityRepository;
 import com.medvedskiy.repository.tenanting.ThreadLocalStorage;
+import com.medvedskiy.tests.BeanInjector;
+import com.medvedskiy.tests.DBCleanup;
+import com.medvedskiy.tests.config.TestPaymentDatasourceConfig;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -57,9 +58,9 @@ public class ShardingServiceTest {
                 allSetsMerged.add(item);
             }
         }
-        if (totalItemCount != allSetsMerged.size()) {
-            throw new Exception("Total count of IDs and count of unique ids from all DBs did not match, sharding failed");
-        }
+        Assertions.assertFalse(allSetsMerged.isEmpty());
+        Assertions.assertEquals(totalItemCount, allSetsMerged.size(),
+                "Total count of IDs and count of unique ids from all DBs did not match, sharding failed");
 
     }
 

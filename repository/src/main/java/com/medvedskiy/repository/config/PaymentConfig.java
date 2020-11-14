@@ -76,7 +76,6 @@ public class PaymentConfig {
 
     private Properties hibernateProperties() {
         Properties properties = new Properties();
-        //properties.put("hibernate.hbm2ddl.auto", false);
         properties.put("hibernate.dialect", dialect);
         properties.put("hibernate.temp.use_jdbc_metadata_defaults", "false");
         properties.put("hibernate.show_sql", showSql);

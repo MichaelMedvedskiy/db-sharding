@@ -12,6 +12,7 @@
         <module>repository</module>
         <module>api</module>
         <module>core-sharding</module>
+        <module>tests</module>
     </modules>
 
     <parent>

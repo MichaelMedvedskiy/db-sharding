@@ -1,4 +1,4 @@
-package com.medvedskiy.core.test.config;
+package com.medvedskiy.tests.config;
 
 import com.medvedskiy.repository.tenanting.DynamicTenantAwareRoutingSource;
 import org.springframework.context.annotation.Bean;

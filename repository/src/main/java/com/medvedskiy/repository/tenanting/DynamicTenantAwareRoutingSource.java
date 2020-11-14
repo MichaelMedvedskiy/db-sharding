@@ -1,6 +1,3 @@
-// Copyright (c) Philipp Wagner. All rights reserved.
-// Licensed under the MIT license. See LICENSE file in the project root for full license information.
-
 package com.medvedskiy.repository.tenanting;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,15 +27,11 @@ public class DynamicTenantAwareRoutingSource extends AbstractRoutingDataSource {
     }
 
     @Override
-    public void afterPropertiesSet() {
-        // Nothing to do ..
-    }
+    public void afterPropertiesSet() { }
 
     @Override
     protected DataSource determineTargetDataSource() {
         String lookupKey = (String) determineCurrentLookupKey();
-
-        // And finally return it:
         return tenants.get(lookupKey);
     }
 
@@ -48,13 +41,9 @@ public class DynamicTenantAwareRoutingSource extends AbstractRoutingDataSource {
     }
 
     private ConcurrentMap<String, HikariDataSource> getDataSources() {
-
-        // Deserialize the JSON:
         DatabaseConfiguration[] configurations = getDatabaseConfigurations();
-        //Set database count
         ThreadLocalStorage.setDatabaseCount(configurations.length);
 
-        // Now create a Lookup Table:
         return Arrays
                 .stream(configurations)
                 .collect(Collectors.toConcurrentMap(x ->

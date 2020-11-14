@@ -19,7 +19,9 @@ public class ThreadLocalStorage {
     }
 
     public static void setDatabaseCount(int databaseCount) {
-        ThreadLocalStorage.databaseCount = databaseCount;
+        if (ThreadLocalStorage.databaseCount == 0) {
+            ThreadLocalStorage.databaseCount = databaseCount;
+        }
     }
 }
 

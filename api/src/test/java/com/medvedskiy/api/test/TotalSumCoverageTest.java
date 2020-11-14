@@ -6,9 +6,10 @@ import com.medvedskiy.api.ApiRunner;
 import com.medvedskiy.core.config.CoreConfig;
 import com.medvedskiy.core.models.Payment;
 import com.medvedskiy.core.models.TotalSumWrapper;
-import com.medvedskiy.core.util.BeanInjector;
-import com.medvedskiy.core.util.DBCleanup;
-import com.medvedskiy.core.util.FileAsString;
+import com.medvedskiy.tests.BeanInjector;
+import com.medvedskiy.tests.DBCleanup;
+import com.medvedskiy.tests.FileAsString;
+import com.medvedskiy.tests.config.TestPaymentDatasourceConfig;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,7 +25,7 @@ import java.util.List;
 /**
  * Coverage test for sharding + retrieving total sum of sender
  */
-@ContextConfiguration(classes = {CoreConfig.class})
+@ContextConfiguration(classes = {CoreConfig.class, TestPaymentDatasourceConfig.class})
 @ExtendWith({
         DBCleanup.class,
         BeanInjector.class})
@@ -59,8 +60,6 @@ public class TotalSumCoverageTest {
         ResponseEntity<TotalSumWrapper> sumForSenderId99999
                 = restTemplate.getForEntity("http://localhost:8080/api/v1/total/sender" + "/99999", TotalSumWrapper.class);
         Assertions.assertEquals(sumForSenderId99999.getBody().totalSum(), 0);
-
-        System.out.println(123);
 
     }
 }

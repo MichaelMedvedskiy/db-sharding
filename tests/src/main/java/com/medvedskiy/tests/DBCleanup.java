@@ -1,4 +1,4 @@
-package com.medvedskiy.core.util;
+package com.medvedskiy.tests;
 
 import com.medvedskiy.repository.repositories.association.AssociationEntityRepository;
 import com.medvedskiy.repository.repositories.payment.PaymentEntityRepository;
@@ -45,10 +45,6 @@ public class DBCleanup implements BeforeAllCallback, BeforeEachCallback, AfterAl
      * deletes all from all 4 databases
      */
     void cleanDB() {
-//
-//        firstDBRepository.deleteAll();
-//        secondDBRepository.deleteAll();
-//        thirdDBRepository.deleteAll();
         int databaseCount = ThreadLocalStorage.getDatabaseCount();
         for (int i = 0; i < databaseCount; i++) {
             ThreadLocalStorage.setTenantName(String.valueOf(i));
