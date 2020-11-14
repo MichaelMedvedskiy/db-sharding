@@ -3,6 +3,7 @@ package com.medvedskiy.core.test;
 import com.medvedskiy.core.config.CoreConfig;
 import com.medvedskiy.core.models.Payment;
 import com.medvedskiy.core.services.ShardingService;
+import com.medvedskiy.core.test.config.TestPaymentDatasourceConfig;
 import com.medvedskiy.core.util.BeanInjector;
 import com.medvedskiy.core.util.DBCleanup;
 import com.medvedskiy.repository.repositories.payment.PaymentEntityRepository;
@@ -16,7 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@ContextConfiguration(classes = {CoreConfig.class})
+@ContextConfiguration(classes = {CoreConfig.class, TestPaymentDatasourceConfig.class})
 @ExtendWith({
         DBCleanup.class,
         BeanInjector.class})
@@ -37,7 +38,6 @@ public class ShardingServiceTest {
             ShardingService shardingService,
             PaymentEntityRepository paymentEntityRepository
     ) throws Exception {
-        //todo: from env
         int databaseCount = ThreadLocalStorage.getDatabaseCount();
 
         for (long i = 0; i < rnd(99) + 10; i++) {
@@ -61,12 +61,6 @@ public class ShardingServiceTest {
             throw new Exception("Total count of IDs and count of unique ids from all DBs did not match, sharding failed");
         }
 
-
-        //todo: database count from tenants, add DBCleanup, MOOOOVE
-//        if (idsFromDB1.stream().anyMatch(idsFromDB2::contains) || idsFromDB2.stream().anyMatch(idsFromDB3::contains)) {
-//            throw new RuntimeException("Failed Sharding");
-//        }
-        System.out.println(1231);
     }
 
     public List<Payment> rndPaymentList() {

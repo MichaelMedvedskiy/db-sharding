@@ -2,7 +2,7 @@ package com.medvedskiy.repository.config;
 
 import com.medvedskiy.repository.tenanting.DynamicTenantAwareRoutingSource;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -23,22 +23,29 @@ import java.util.Properties;
         entityManagerFactoryRef = "paymentEntityManager",
         transactionManagerRef = "paymentTransactionManager")
 @PropertySource({"classpath:hibernate.properties"})
-@ConfigurationProperties("hibernate")
 public class PaymentConfig {
 
+    @Value("${dialect}")
     private String dialect;
+    @Value("${showSql}")
     private String showSql;
+    @Value("${formatSql}")
     private String formatSql;
+    @Value("${packages}")
     private String packages;
+    @Value("${releaseMode}")
     private String releaseMode;
 
     @Bean
-    public DataSource paymentDataSource() {
+    public AbstractRoutingDataSource abstractRoutingDataSource() {
+        return new DynamicTenantAwareRoutingSource("tenants.json");
+    }
 
-        AbstractRoutingDataSource dataSource = new DynamicTenantAwareRoutingSource("tenants.json");
-
+    @Bean
+    public DataSource paymentDataSource(
+            AbstractRoutingDataSource dataSource
+    ) {
         dataSource.afterPropertiesSet();
-
         return dataSource;
     }
 

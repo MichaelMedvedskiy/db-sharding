@@ -33,7 +33,7 @@ public class ShardingService {
     private final AssociationEntityRepository associationEntityRepository;
 
     private final PaymentEntityRepository paymentEntityRepository;
-    //todo: make it from tenants.json somehow
+
     private final int databaseCount;
 
     public ShardingService(
